@@ -995,6 +995,22 @@ textarea.field{resize:none;min-height:68px}
         </div>
         <button class="btn2" onclick="savePracticeSettings()" style="width:100%;">✅ Practice Schedule Save Karo</button>
         <div id="practice-status" style="font-size:12px;color:var(--text3);margin-top:8px;text-align:center;min-height:16px;"></div>
+        
+        <!-- Background push via OneSignal Journeys -->
+        <div style="margin-top:12px;padding:12px;background:var(--bg3);border-radius:var(--rs);border:1px solid var(--border);">
+          <div style="font-size:11px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;">🚀 Browser Band Pe Bhi — OneSignal Setup</div>
+          <div style="font-size:12px;color:var(--text2);line-height:1.9;">
+            <strong style="color:var(--text);">Step 1:</strong> <a href="https://dashboard.onesignal.com/apps/0f032edc-8666-47ec-887b-0087ea8d5c6d/journeys" target="_blank" style="color:var(--blue);">OneSignal Journeys</a> kholo<br>
+            <strong style="color:var(--text);">Step 2:</strong> "New Journey" → "Scheduled" select karo<br>
+            <strong style="color:var(--text);">Step 3:</strong> Apna time daalo (e.g. 9:00 PM daily)<br>
+            <strong style="color:var(--text);">Step 4:</strong> Message: "DailyCore 📔 — Aaj ki entry karo! 🔥"<br>
+            <strong style="color:var(--text);">Step 5:</strong> Save & Start karo<br><br>
+            <span style="color:var(--text3);font-size:11px;">✅ Ek baar set karo — phir browser band ho tab bhi daily notification aayegi!</span>
+          </div>
+          <button onclick="window.open('https://dashboard.onesignal.com/apps/0f032edc-8666-47ec-887b-0087ea8d5c6d/journeys','_blank')" style="margin-top:10px;width:100%;padding:10px;background:linear-gradient(135deg,var(--gold2),var(--gold));border:none;border-radius:var(--rs);color:#0d0f14;font-family:'DM Sans',sans-serif;font-weight:700;font-size:13px;cursor:pointer;">
+            🚀 OneSignal Journeys Kholo
+          </button>
+        </div>
       </div>
     </div>
 
@@ -1208,6 +1224,39 @@ let _deferredInstall = null;
 const IS_IOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
 const VOICE_OK = !IS_IOS && !!(window.SpeechRecognition || window.webkitSpeechRecognition);
 
+// ─── OneSignal: Tag user when entry saved ─────────────────
+function osTagEntryDone() {
+  // Send today's date as tag to OneSignal
+  // Journey will use this to SKIP notification if entry done
+  const today = todayKey(); // YYYY-MM-DD
+  if (window._oneSignal) {
+    try {
+      window._oneSignal.User.addTags({
+        last_entry_date: today,
+        streak: String(calcStreak()),
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'Asia/Kolkata'
+      });
+    } catch(_) {}
+  }
+  // Also store locally for backup
+  localStorage.setItem('dc_last_entry', today);
+}
+
+// ─── Tag schedule times (called when diary settings saved) ─
+function osTagSchedule() {
+  if (!window._oneSignal) return;
+  const s = S.settings || {};
+  try {
+    window._oneSignal.User.addTags({
+      morning_time:  s.morningTime || '07:00',
+      evening_time:  s.eveningTime || '21:00',
+      last_time:     s.lastTime    || '22:30',
+      timezone:      Intl.DateTimeFormat().resolvedOptions().timeZone || 'Asia/Kolkata',
+      active: 'true'
+    });
+  } catch(_) {}
+}
+
 // ═══════════════════════════════════════
 //  INIT
 // ═══════════════════════════════════════
@@ -1247,6 +1296,8 @@ function init() {
   restorePinState();
   checkMilestone(calcStreak());
   initPracticeSchedule();
+  // Tag OneSignal on load (update streak + last entry)
+  setTimeout(() => { if(S.entries[todayKey()]) osTagEntryDone(); else osTagSchedule(); }, 2000);
   showSplash();
 }
 
@@ -1745,7 +1796,7 @@ function saveQuick() {
   if(!_mood.q){toast('Mood select karo pehle!','error');return;}
   const tk=todayKey(), prevXP=S.xp||0, streak=calcStreak()+1;
   S.entries[tk]=mkEntry('quick',{mood:_mood.q,overall:parseInt(g('q-score')?.value)||5,highlight:g('q-highlight')?.value.trim()||''});
-  addXP(10); checkBadges(); save();
+  addXP(10); checkBadges(); save(); osTagEntryDone();
   const msgs={disciplined:'Khatam! Disciplined raha aaj 💪',lazy:'Phir bhi likha — yahi counts 🤝',mixed:'Mixed day — but likhna nahi choda ✓'};
   showSaveSuccess('⚡', msgs[_mood.q]||'Entry ho gayi!', `Streak: ${streak} din 🔥`);
   showXPModal(10,prevXP); checkMilestone(streak);
@@ -1765,7 +1816,7 @@ function saveFull() {
     focus10:parseInt(g('sl-focus10')?.value)||5, overall:parseInt(g('sl-overall')?.value)||5,
   });
   let xpGain=30; if(checked>=S.habits.length&&checked>0)xpGain+=20;
-  addXP(xpGain); checkBadges(); save();
+  addXP(xpGain); checkBadges(); save(); osTagEntryDone();
   const score=parseInt(g('sl-overall')?.value)||5;
   const sub=score>=8?'Excellent day — apne aap pe proud hona chahiye! 🏆':score>=6?`+${xpGain} XP • Kal aur better karenge`:`Tough day tha — lekin aaya toh sahi 🤝`;
   showSaveSuccess('📝','Full entry lock ho gayi!',sub);
@@ -1797,7 +1848,7 @@ function useGrace() {
   if(!S.graceUsed)S.graceUsed={};
   S.graceUsed[mk]=true;
   S.entries[todayKey()]=mkEntry('grace',{mood:'—',overall:0});
-  save(); renderHome();
+  save(); renderHome(); osTagEntryDone();
   showModal('🛡️','Grace Day Use Hua!','Streak safe hai! Mahine mein sirf 1 baar — wisely use karo.');
 }
 
@@ -2206,7 +2257,7 @@ function renderSettings() {
 
 function saveSettings() {
   S.settings={...S.settings,morningTime:g('r-morning')?.value,eveningTime:g('r-evening')?.value,lastTime:g('r-last')?.value,weeklyReview:g('tog-weekly')?.checked};
-  save(); toast('✅ Settings save ho gayi!','success');
+  save(); osTagSchedule(); toast('✅ Settings save ho gayi!','success');
 }
 
 function renderBadges() {
@@ -2827,13 +2878,11 @@ function restorePracticeUI() {
 
 // ─── Init daily practice schedule (called on app start) ────
 function initPracticeSchedule() {
+  // Always start heartbeat (it checks permission internally)
+  startReminderHeartbeat();
   if (Notification.permission !== 'granted') return;
-  // Schedule reminders
   setTimeout(scheduleReminders, 1000);
   setTimeout(schedulePracticeNotifications, 1500);
-  // Start the heartbeat checker — checks every 60 seconds if a reminder is due
-  // This works even after navigation within the app
-  startReminderHeartbeat();
 }
 
 function startReminderHeartbeat() {
