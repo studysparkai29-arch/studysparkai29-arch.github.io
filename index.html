@@ -534,6 +534,26 @@ textarea.field{resize:none;min-height:68px}
 .pdf-sel:focus{outline:none;border-color:var(--gold)}
 .pdf-btn{width:100%;padding:14px;background:linear-gradient(135deg,#ef4444,#dc2626);border:none;border-radius:var(--rs);color:white;font-family:'DM Sans',sans-serif;font-weight:800;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:all .2s}
 .notif-hint{font-size:11px;color:var(--text3);line-height:1.5;padding:8px 12px;background:var(--bg3);border-radius:8px;margin-top:6px}
+/* ═══ JOURNEY REVIEW ═══ */
+.jr-tabs{display:flex;gap:6px;margin:0 16px 12px;overflow-x:auto;padding-bottom:2px}
+.jr-tab{padding:8px 16px;border-radius:20px;border:1.5px solid var(--border);background:var(--card);color:var(--text2);font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .2s;flex-shrink:0}
+.jr-tab.active{background:var(--gl);border-color:var(--gold);color:var(--gold)}
+.jr-item{background:var(--card);border:1px solid var(--border);border-radius:var(--rs);padding:14px 16px;margin-bottom:10px}
+.jr-date{font-size:11px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between}
+.jr-score{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--gold)}
+.jr-text{font-size:14px;color:var(--text);line-height:1.7}
+.jr-mood-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px}
+.jr-empty{text-align:center;padding:40px 20px;color:var(--text3);font-size:14px}
+.jr-filter{margin:0 16px 10px;display:flex;gap:8px;align-items:center}
+.jr-filter select{flex:1;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px}
+.jr-stats-bar{margin:0 16px 12px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.jr-stat{background:var(--card);border:1px solid var(--border);border-radius:var(--rs);padding:10px;text-align:center}
+.jr-stat-n{font-family:'Playfair Display',serif;font-size:20px;font-weight:900;color:var(--gold)}
+.jr-stat-l{font-size:10px;color:var(--text3);font-weight:700;text-transform:uppercase}
+.jr-highlight{background:rgba(245,166,35,.08);border-left:3px solid var(--gold);padding:8px 12px;border-radius:0 6px 6px 0;margin-top:6px;font-size:13px;color:var(--text2);line-height:1.6}
+.jr-mistake{background:rgba(248,113,113,.08);border-left:3px solid var(--red);padding:8px 12px;border-radius:0 6px 6px 0;margin-top:6px;font-size:13px;color:var(--text2);line-height:1.6}
+.jr-learning{background:rgba(74,222,128,.08);border-left:3px solid var(--green);padding:8px 12px;border-radius:0 6px 6px 0;margin-top:6px;font-size:13px;color:var(--text2);line-height:1.6}
+.jr-improve{background:rgba(96,165,250,.08);border-left:3px solid var(--blue);padding:8px 12px;border-radius:0 6px 6px 0;margin-top:6px;font-size:13px;color:var(--text2);line-height:1.6}
 .day-btn{padding:7px 10px;background:var(--bg3);border:1.5px solid var(--border);border-radius:8px;color:var(--text3);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s}
 .day-btn.active{background:var(--gl);border-color:var(--gold);color:var(--gold)}
 .pt-item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border)}
@@ -920,7 +940,14 @@ textarea.field{resize:none;min-height:68px}
 
 <!-- HISTORY -->
 <div class="screen" id="screen-history">
-  <div class="pg-hd"><div class="pg-title">📅 History</div><div class="pg-sub">Apni journey dekho</div></div>
+  <div class="pg-hd">
+    <div class="pg-title">📅 History</div>
+    <div class="pg-sub">Apni journey dekho</div>
+    <div style="display:flex;gap:8px;margin-top:12px;">
+      <button class="jr-tab active" onclick="void 0" style="pointer-events:none;">📅 Calendar</button>
+      <button class="jr-tab" onclick="nav('screen-journey')" style="background:var(--gl);border-color:var(--gold);color:var(--gold);">📖 Meri Journey Review</button>
+    </div>
+  </div>
   <div class="search-wrap"><span class="search-icon">🔍</span><input type="search" class="search-input" id="search-in" placeholder="Entry search karo — koi bhi word..." oninput="doSearch(this.value)"></div>
   <div id="search-res" style="display:none;padding:0 16px;"></div>
   <div id="cal-section">
@@ -929,6 +956,35 @@ textarea.field{resize:none;min-height:68px}
     <div class="calendar"><div class="cdow"><div class="cdl">M</div><div class="cdl">T</div><div class="cdl">W</div><div class="cdl">T</div><div class="cdl">F</div><div class="cdl">S</div><div class="cdl">S</div></div><div class="cgrid" id="cal-grid"></div></div>
     <div class="ep" id="ep"><div class="ep-empty">👆 Kisi bhi din pe tap karo — entry detail yahan dikhegi</div></div>
   </div>
+</div>
+
+<!-- JOURNEY REVIEW -->
+<div class="screen" id="screen-journey">
+  <div class="pg-hd">
+    <div class="pg-title">📖 Meri Journey</div>
+    <div class="pg-sub">Saari galtiyan • Learnings • Improvements — ek jagah</div>
+  </div>
+  <!-- Stats bar -->
+  <div class="jr-stats-bar" id="jr-stats"></div>
+  <!-- Filter -->
+  <div class="jr-filter">
+    <select id="jr-filter-sel" onchange="renderJourney()">
+      <option value="all">📅 Saari Entries</option>
+      <option value="7">Pichle 7 din</option>
+      <option value="30">Pichle 30 din</option>
+      <option value="90">Pichle 90 din</option>
+    </select>
+  </div>
+  <!-- Tabs -->
+  <div class="jr-tabs">
+    <button class="jr-tab active" onclick="switchJrTab('mistakes',this)">❌ Galtiyan</button>
+    <button class="jr-tab" onclick="switchJrTab('learnings',this)">💡 Learnings</button>
+    <button class="jr-tab" onclick="switchJrTab('improvements',this)">📈 Improvements</button>
+    <button class="jr-tab" onclick="switchJrTab('pride',this)">🏆 Proud Moments</button>
+    <button class="jr-tab" onclick="switchJrTab('full',this)">📔 Full Diary</button>
+  </div>
+  <!-- Content -->
+  <div style="padding:0 16px;" id="jr-content"></div>
 </div>
 
 <!-- SETTINGS -->
@@ -1432,7 +1488,7 @@ function toggleMode() {
 // ═══════════════════════════════════════
 //  NAVIGATION
 // ═══════════════════════════════════════
-const NAV_MAP = { 'screen-home':'nb-home','screen-full':'nb-write','screen-quick':'nb-write','screen-morning':'nb-write','screen-review':'nb-write','screen-analytics':'nb-stats','screen-history':'nb-hist','screen-settings':'nb-set' };
+const NAV_MAP = { 'screen-home':'nb-home','screen-full':'nb-write','screen-quick':'nb-write','screen-morning':'nb-write','screen-review':'nb-write','screen-analytics':'nb-stats','screen-history':'nb-hist','screen-journey':'nb-hist','screen-settings':'nb-set' };
 const PRO_SCREENS = ['screen-morning','screen-review','screen-analytics'];
 
 function nav(id) {
@@ -1446,6 +1502,7 @@ function nav(id) {
   document.querySelectorAll('.nb').forEach(b=>b.classList.remove('active'));
   document.getElementById(NAV_MAP[id])?.classList.add('active');
   if (id==='screen-history') renderCal();
+  if (id==='screen-journey') renderJourney();
   if (id==='screen-analytics') renderAnalytics();
   if (id==='screen-settings') renderSettings();
   if (id==='screen-full') { renderHabits(); renderMorningHabits(); buildVoiceRows(); initSliders(); }
@@ -1976,16 +2033,40 @@ function showPreview(key) {
   const ep=g('ep'); if(!ep)return;
   const e=S.entries[key], m=S.morningEntries?.[key];
   if(!e&&!m){ep.innerHTML=`<div class="ep-date">${fmtFull(key)}</div><div class="ep-empty">Is din koi entry nahi hai</div>`;return;}
-  let html=`<div class="ep-date">${fmtFull(key)}</div>`;
-  if(m?.intention)html+=`<div style="font-size:13px;color:var(--blue);margin-bottom:10px;">🌅 ${m.intention}</div>`;
+  let html=`<div class="ep-date" style="font-size:12px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;">${fmtFull(key)}</div>`;
+  // Morning intention
+  if(m?.intention) html+=`<div style="background:rgba(96,165,250,.1);border-left:3px solid var(--blue);padding:8px 12px;border-radius:0 6px 6px 0;font-size:13px;color:var(--blue);margin-bottom:8px;">🌅 ${m.intention}</div>`;
+  if(m?.priorities?.filter(p=>p).length) html+=`<div style="font-size:12px;color:var(--text3);margin-bottom:8px;">📌 ${m.priorities.filter(p=>p).join(' • ')}</div>`;
   if(e){
     const me={disciplined:'💪',lazy:'😴',mixed:'😐','—':'—'}[e.mood]||'😐';
-    if(e.type!=='grace')html+=`<div class="ep-mood ${e.mood}">${me} ${e.mood||'—'}</div>`;
-    else html+=`<div class="ep-mood" style="background:var(--pd);color:var(--purple);">🛡️ Grace Day</div>`;
-    if(e.habits){html+=`<div class="ep-habits">`;Object.keys(e.habits).slice(0,6).forEach(h=>{html+=`<div class="eht ${e.habits[h]?'done':'miss'}">${e.habits[h]?'✓':'✗'} ${h}</div>`;});html+=`</div>`;}
-    if(e.highlight)html+=`<div class="ep-q">Highlight</div><div class="ep-a">${e.highlight}</div>`;
-    if(e.reflection?.[0])html+=`<div class="ep-q">क्या किया?</div><div class="ep-a">${e.reflection[0]}</div>`;
-    if(e.overall>0)html+=`<div class="ep-scores">${e.effort?`<div><div class="eps-num">${e.effort}</div><div class="eps-lbl">Effort</div></div>`:''}<div><div class="eps-num">${e.overall}</div><div class="eps-lbl">Overall</div></div></div>`;
+    const mc=e.mood==='disciplined'?'var(--green)':e.mood==='lazy'?'var(--red)':'var(--gold)';
+    if(e.type==='grace') html+=`<div style="background:var(--pd);color:var(--purple);display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:20px;font-size:12px;font-weight:700;margin-bottom:10px;">🛡️ Grace Day</div>`;
+    else html+=`<div style="display:inline-flex;align-items:center;gap:8px;margin-bottom:10px;"><span style="font-size:13px;font-weight:700;color:${mc};">${me} ${e.mood||'—'}</span>${e.overall>0?`<span style="font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--gold);">${e.overall}/10</span>`:''}${e.effort?`<span style="font-size:11px;color:var(--text3);">Effort: ${e.effort}/10</span>`:''}${e.nonneg?`<span style="font-size:11px;color:var(--text3);">🎯 ${e.nonneg.substring(0,25)}</span>`:''}
+    </div>`;
+    // Habits
+    if(e.habits){
+      const done=Object.keys(e.habits).filter(h=>e.habits[h]);
+      const miss=Object.keys(e.habits).filter(h=>!e.habits[h]);
+      if(done.length||miss.length){
+        html+=`<div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px;">`;
+        done.forEach(h=>html+=`<span style="background:var(--gd);color:var(--green);padding:2px 8px;border-radius:6px;font-size:11px;font-weight:700;">✓ ${h}</span>`);
+        miss.forEach(h=>html+=`<span style="background:var(--rd);color:var(--red);padding:2px 8px;border-radius:6px;font-size:11px;font-weight:700;">✗ ${h}</span>`);
+        html+=`</div>`;
+      }
+    }
+    // Highlight
+    if(e.highlight) html+=`<div style="background:rgba(245,166,35,.1);border-left:3px solid var(--gold);padding:8px 12px;border-radius:0 6px 6px 0;font-size:13px;color:var(--text);margin-bottom:6px;">⚡ ${e.highlight}</div>`;
+    // Full reflections — ALL shown
+    const refLabels=['क्या किया','क्या गलत किया','किस बात पर गर्व','क्या सीखा','Discomfort'];
+    const refColors=['rgba(245,166,35,.1)','rgba(248,113,113,.1)','rgba(74,222,128,.1)','rgba(74,222,128,.1)','rgba(96,165,250,.1)'];
+    const refBorder=['var(--gold)','var(--red)','var(--green)','var(--green)','var(--blue)'];
+    const refEmoji=['📋','❌','🏆','💡','💪'];
+    (e.reflection||[]).forEach((r,i)=>{
+      if(r?.trim()) html+=`<div style="background:${refColors[i]};border-left:3px solid ${refBorder[i]};padding:8px 12px;border-radius:0 6px 6px 0;margin-bottom:6px;"><div style="font-size:10px;font-weight:700;color:${refBorder[i]};text-transform:uppercase;margin-bottom:3px;">${refEmoji[i]} ${refLabels[i]}</div><div style="font-size:13px;color:var(--text);line-height:1.6;">${r}</div></div>`;
+    });
+    // Notes + Tomorrow
+    if(e.notes?.trim()) html+=`<div style="background:rgba(167,139,250,.08);border-left:3px solid var(--purple);padding:8px 12px;border-radius:0 6px 6px 0;margin-bottom:6px;font-size:13px;color:var(--text);line-height:1.6;">📌 ${e.notes}</div>`;
+    if(e.tomorrow?.trim()) html+=`<div style="background:rgba(96,165,250,.08);border-left:3px solid var(--blue);padding:8px 12px;border-radius:0 6px 6px 0;margin-bottom:6px;font-size:13px;color:var(--text);line-height:1.6;">📈 Kal: ${e.tomorrow}</div>`;
   }
   ep.innerHTML=html;
 }
@@ -2198,6 +2279,164 @@ function _last14(){const labels=[],scores=[];for(let i=13;i>=0;i--){const d=new 
 function _habitStats(){const stats={};let dc=0;for(let i=0;i<30;i++){const d=new Date();d.setDate(d.getDate()-i);const e=S.entries[fmtKey(d)];if(e?.habits){dc++;Object.keys(e.habits).forEach(h=>{if(!stats[h])stats[h]={done:0};if(e.habits[h])stats[h].done++;});}}if(!dc)return[];return S.habits.map(h=>({name:h,pct:stats[h]?Math.round(stats[h].done/dc*100):0})).sort((a,b)=>b.pct-a.pct);}
 function _dowStats(){const tots=[0,0,0,0,0,0,0],cnts=[0,0,0,0,0,0,0];Object.entries(S.entries).forEach(([k,e])=>{if(!e.overall)return;const dw=(new Date(k+'T00:00:00').getDay()||7)-1;tots[dw]+=e.overall;cnts[dw]++;});return tots.map((t,i)=>cnts[i]>0?t/cnts[i]:0);}
 function _topHabit(){const c={};Object.values(S.entries).forEach(e=>{if(e.habits)Object.keys(e.habits).forEach(h=>{if(e.habits[h])c[h]=(c[h]||0)+1;});});const t=Object.entries(c).sort((a,b)=>b[1]-a[1])[0];return t?t[0]:'None yet';}
+
+
+// ═══════════════════════════════════════
+//  📖 JOURNEY REVIEW — Saari galtiyan, learnings, improvements
+// ═══════════════════════════════════════
+let _jrTab = 'mistakes';
+
+function switchJrTab(tab, btn) {
+  _jrTab = tab;
+  document.querySelectorAll('.jr-tab').forEach(b => b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+  renderJourney();
+}
+
+function renderJourney() {
+  const cont = g('jr-content'); if(!cont) return;
+  const statsBar = g('jr-stats');
+  const filterSel = g('jr-filter-sel');
+  const days = filterSel ? parseInt(filterSel.value) || 0 : 0;
+
+  // Get entries within filter range
+  const now = new Date();
+  const allKeys = Object.keys(S.entries).sort().reverse(); // newest first
+  const keys = days > 0
+    ? allKeys.filter(k => {
+        const d = new Date(k + 'T00:00:00');
+        return (now - d) / 86400000 <= days;
+      })
+    : allKeys;
+
+  const fullEntries = keys.filter(k => S.entries[k]?.type === 'full');
+
+  // Stats bar
+  if(statsBar) {
+    const totalFull = fullEntries.length;
+    const avgScore = totalFull > 0
+      ? (fullEntries.reduce((s,k) => s + (S.entries[k].overall||0), 0) / totalFull).toFixed(1)
+      : '—';
+    const mistakeCount = fullEntries.filter(k => S.entries[k]?.reflection?.[1]?.trim()).length;
+    statsBar.innerHTML = `
+      <div class="jr-stat"><div class="jr-stat-n">${totalFull}</div><div class="jr-stat-l">Full Entries</div></div>
+      <div class="jr-stat"><div class="jr-stat-n">${avgScore}</div><div class="jr-stat-l">Avg Score</div></div>
+      <div class="jr-stat"><div class="jr-stat-n">${mistakeCount}</div><div class="jr-stat-l">Mistakes Noted</div></div>
+    `;
+  }
+
+  if(!fullEntries.length) {
+    cont.innerHTML = '<div class="jr-empty">📝 Koi Full Entry nahi mili<br><small>Full Entry karo tab yahan sab dikhega</small></div>';
+    return;
+  }
+
+  const frag = document.createDocumentFragment();
+
+  if(_jrTab === 'mistakes') {
+    // All mistakes across all entries
+    let count = 0;
+    fullEntries.forEach(k => {
+      const e = S.entries[k];
+      const mistake = e?.reflection?.[1]?.trim();
+      if(!mistake) return;
+      count++;
+      const div = _jrCard(k, e);
+      div.innerHTML += `<div class="jr-mistake">❌ ${mistake}</div>`;
+      frag.appendChild(div);
+    });
+    if(!count) cont.innerHTML = '<div class="jr-empty">✅ Koi mistake note nahi ki abhi tak!<br><small>Full Entry mein "क्या गलत किया" fill karo</small></div>';
+
+  } else if(_jrTab === 'learnings') {
+    let count = 0;
+    fullEntries.forEach(k => {
+      const e = S.entries[k];
+      const learning = e?.reflection?.[3]?.trim();
+      if(!learning) return;
+      count++;
+      const div = _jrCard(k, e);
+      div.innerHTML += `<div class="jr-learning">💡 ${learning}</div>`;
+      frag.appendChild(div);
+    });
+    if(!count) cont.innerHTML = '<div class="jr-empty">💡 Koi learning note nahi ki abhi tak!<br><small>Full Entry mein "क्या सीखा" fill karo</small></div>';
+
+  } else if(_jrTab === 'improvements') {
+    let count = 0;
+    fullEntries.forEach(k => {
+      const e = S.entries[k];
+      const improve = e?.tomorrow?.trim();
+      if(!improve) return;
+      count++;
+      const div = _jrCard(k, e);
+      div.innerHTML += `<div class="jr-improve">📈 ${improve}</div>`;
+      frag.appendChild(div);
+    });
+    if(!count) cont.innerHTML = '<div class="jr-empty">📈 Koi improvement plan nahi<br><small>Full Entry mein "Kal kya better" fill karo</small></div>';
+
+  } else if(_jrTab === 'pride') {
+    let count = 0;
+    fullEntries.forEach(k => {
+      const e = S.entries[k];
+      const pride = e?.reflection?.[2]?.trim();
+      if(!pride) return;
+      count++;
+      const div = _jrCard(k, e);
+      div.innerHTML += `<div class="jr-learning">🏆 ${pride}</div>`;
+      frag.appendChild(div);
+    });
+    if(!count) cont.innerHTML = '<div class="jr-empty">🏆 Koi proud moment note nahi<br><small>Full Entry mein "किस बात पर गर्व" fill karo</small></div>';
+
+  } else if(_jrTab === 'full') {
+    // Full diary — everything for each entry
+    fullEntries.forEach(k => {
+      const e = S.entries[k];
+      const m = S.morningEntries?.[k];
+      const div = _jrCard(k, e);
+      const labels = ['क्या किया','क्या गलत किया','किस बात पर गर्व','क्या सीखा','Discomfort'];
+      const colors = ['jr-highlight','jr-mistake','jr-learning','jr-learning','jr-improve'];
+
+      if(m?.intention) div.innerHTML += `<div class="jr-improve">🌅 Intention: ${m.intention}</div>`;
+      if(e.highlight) div.innerHTML += `<div class="jr-highlight">⚡ ${e.highlight}</div>`;
+      (e.reflection||[]).forEach((r,i) => {
+        if(r?.trim()) div.innerHTML += `<div class="${colors[i]||'jr-highlight'}"><strong>${labels[i]}:</strong> ${r}</div>`;
+      });
+      if(e.notes?.trim()) div.innerHTML += `<div class="jr-highlight">📌 ${e.notes}</div>`;
+      if(e.tomorrow?.trim()) div.innerHTML += `<div class="jr-improve">📈 Kal: ${e.tomorrow}</div>`;
+
+      // Habits
+      if(e.habits) {
+        const done = Object.keys(e.habits).filter(h=>e.habits[h]);
+        const miss = Object.keys(e.habits).filter(h=>!e.habits[h]);
+        if(done.length||miss.length) {
+          div.innerHTML += `<div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:8px;">
+            ${done.map(h=>`<span style="background:var(--gd);color:var(--green);padding:2px 8px;border-radius:6px;font-size:11px;font-weight:700;">✓ ${h}</span>`).join('')}
+            ${miss.map(h=>`<span style="background:var(--rd);color:var(--red);padding:2px 8px;border-radius:6px;font-size:11px;font-weight:700;">✗ ${h}</span>`).join('')}
+          </div>`;
+        }
+      }
+      frag.appendChild(div);
+    });
+  }
+
+  cont.replaceChildren(frag);
+  // Small scroll top
+  setTimeout(()=>{ const s=g('screen-journey'); if(s) s.scrollTop=0; },50);
+}
+
+function _jrCard(key, e) {
+  const div = document.createElement('div');
+  div.className = 'jr-item';
+  const moodColor = e.mood==='disciplined'?'var(--green)':e.mood==='lazy'?'var(--red)':'var(--gold)';
+  const moodEmoji = {disciplined:'💪',lazy:'😴',mixed:'😐'}[e.mood]||'📔';
+  div.innerHTML = `
+    <div class="jr-date">
+      <span>${fmtFull(key)}</span>
+      <span class="jr-score">${e.overall>0?e.overall+'/10':''}</span>
+    </div>
+    <div style="display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;color:${moodColor};margin-bottom:4px;">
+      <span class="jr-mood-dot" style="background:${moodColor};"></span>${moodEmoji} ${e.mood||'—'}
+    </div>`;
+  return div;
+}
 
 // ═══════════════════════════════════════
 //  SETTINGS
